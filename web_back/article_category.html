@@ -211,7 +211,13 @@
                   //给模态框里面的新增按钮添加 btn-success
                  $('#model_add').addClass('btn-success').text('保存');
                 $('#addModal').modal('show');
-        })     
+
+                //获取当前点击的a标签的的文字类别和文章别名,显示在模态框对应的input标签中
+                var cateName = $(this).parent().prev().prev().text();
+                var slugName = $(this).parent().prev().text();
+                $('.modal-body .name').val(cateName);
+                $('.modal-body .slug').val(slugName);
+        });    
             //2.在编辑逻辑里面,要传过来id,要告诉编辑逻辑编辑的是哪一个文章类别.
             //3.编辑操作分为2步, 一步是显示修改之前的信息, 一步是把修改后的数据获取后发送ajax请求去修改.\
             //4.新增和编辑使用的是同一个模态框, 所以模态框显示信息,或者某些按钮要做一些修改
