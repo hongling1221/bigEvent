@@ -133,7 +133,7 @@
                 <td>{{v.slug}}</td>
                 <td class="text-center">
                     <a href="javascript:editTr({&quot;id&quot;:&quot;1&quot;,&quot;slug&quot;:&quot;uncategorized&quot;,&quot;name&quot;:&quot;未分类&quot;});" class="btn btn-info btn-xs">编辑</a>
-                    <a href="javascript:deleteTr( {{v.id}} );" class="btn btn-danger btn-xs">删除</a>
+                    <a href="#" data-id="{{v.id}}" class="btn btn-danger btn-xs btn-delete">删除</a>
                 </td>
             </tr>
          {{/each}}
@@ -180,6 +180,28 @@
                     }
                 });
             });
+
+            //1.给删除按钮们注册事件.  使用委托的方式.
+            $('body').on('click', '.btn-delete', function () {
+                var that = $(this)
+                if (confirm('你确定要删除吗?')) {
+                    //2.删除逻辑里面如何知道删除的是哪一个数据呢? 通过id区分.
+                    //搞一个自定义属性data-id来保存id
+                    var id = $(this).attr('data-id');
+                    ///3.根据id删除文章类别的接口通过验证没有问题
+                    $.ajax({
+                        url:'http://localhost:8000/admin/category_delete',
+                        type:'post',
+                        dataType:'json',
+                        data:{id:id},
+                        success: function(backData){
+                         //4.删除成功后,重新的再渲染一次数据
+                         //直接把这一行 从 dom树中移除 就ok.
+                           that.parent().parent().remove();
+                        }
+                    });
+                }
+            })
         })
     </script>
 </body>
