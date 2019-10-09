@@ -91,11 +91,11 @@
                     <form>
                         <div class="form-group">
                             <label for="recipient-name" class="control-label">分类名称:</label>
-                            <input type="text" class="form-control" id="recipient-name">
+                            <input type="text" class="form-control name">
                         </div>
                         <div class="form-group">
                             <label for="message-text" class="control-label">分类别名:</label>
-                            <input type="text" class="form-control" id="recipient-name">
+                            <input type="text" class="form-control slug">
                         </div>
                     </form>
                 </div>
@@ -115,11 +115,6 @@
 
         $('#model_shutoff').click(function () {
             alert('shutoff');
-            $('#addModal').modal('hide');
-        });
-
-        $('#model_add').click(function () {
-            alert('add');
             $('#addModal').modal('hide');
         });
 
@@ -145,17 +140,45 @@
     </script>
     <script>
         $(function () {
-            //1.一进到文章分类页面,发送ajax请求, 获取所有的文章分类信息.    
-            $.ajax({
-                url: 'http://localhost:8000/admin/category_search',
-                type: 'get',
-                dataType: 'json',
-                success: function (backData) {
-                    console.log(backData);
-                    if(backData.code == 200){
-                      $('tbody').html(template('temp_cate',backData))
+            //注意:页面一进来要获取,  新增成功后也要获取, 所以可以搞成一个函数调用.  
+            function getcatedata() {
+                $.ajax({
+                    url: 'http://localhost:8000/admin/category_search',
+                    type: 'get',
+                    dataType: 'json',
+                    success: function (backData) {
+                        console.log(backData);
+                        if (backData.code == 200) {
+                            $('tbody').html(template('temp_cate', backData))
+                        }
                     }
-                }
+                });
+            }
+            //1.一进到文章分类页面,发送ajax请求, 获取所有的文章分类信息.  
+            getcatedata();
+            //1.给新增按钮设置一个点击事件.
+            //注意: 以前写静态模板的时候默认有一个点击事件.要么删掉,要么自己改改.
+            $('#model_add').click(function () {
+                //隐藏模态框
+                $('#addModal').modal('hide');
+                //2.获取用户输入的类别名称和别名
+                var catename = $('.form-group .name').val();
+                var cateslug = $('.form-group .slug').val();
+                //3.发送ajax请求
+                $.ajax({
+                    url: 'http://localhost:8000/admin/category_add',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        name: catename,
+                        slug: cateslug
+                    },
+                    success: function (backData) {
+                        console.log(backData);
+                        //4.新增成功后,再重新获取一次文章类别
+                        getcatedata();
+                    }
+                });
             });
         })
     </script>
