@@ -72,7 +72,7 @@
                 <tfoot>
                     <tr>
                         <td colspan="3" class="text-center">
-                            <a href="#" class="btn btn-success" data-toggle="modal" data-target="#addModal">新增分类</a>
+                            <a href="#" class="btn btn-success btn-addCate" data-toggle="modal" data-target="#addModal">新增分类</a>
                         </td>
                     </tr>
                 </tfoot>
@@ -114,16 +114,9 @@
         });
 
         $('#model_shutoff').click(function () {
-            alert('shutoff');
             $('#addModal').modal('hide');
         });
-
-        $('.category_table').delegate('a', 'click', function () {
-            if ($(this).hasClass('btn-info')) {
-                $('#addModal .modal-title').html('修改分类名称');
-                $('#addModal').modal('show');
-            }
-        })      
+ 
     </script>
     <script src="./js/template-web.js"></script>
     <script id="temp_cate" type="text/html">
@@ -132,7 +125,7 @@
                 <td>{{v.name}}</td>
                 <td>{{v.slug}}</td>
                 <td class="text-center">
-                    <a href="javascript:editTr({&quot;id&quot;:&quot;1&quot;,&quot;slug&quot;:&quot;uncategorized&quot;,&quot;name&quot;:&quot;未分类&quot;});" class="btn btn-info btn-xs">编辑</a>
+                    <a href="#" data-id="{{v.id}}" class="btn btn-info btn-xs btn-bianji">编辑</a>
                     <a href="#" data-id="{{v.id}}" class="btn btn-danger btn-xs btn-delete">删除</a>
                 </td>
             </tr>
@@ -156,6 +149,14 @@
             }
             //1.一进到文章分类页面,发送ajax请求, 获取所有的文章分类信息.  
             getcatedata();
+            
+            //给最外面的新增分类按钮注册点击事件 修改显示文本
+             $('.btn-addCate').on('click',function(){
+                 //修改模态框tlete显示文本
+                $('#addModal .modal-title').html('新增分类');
+                  //给模态框里面的移除按钮添加 btn-success
+                 $('#model_add').removeClass('btn-success').text('新增');
+             })
             //1.给新增按钮设置一个点击事件.
             //注意: 以前写静态模板的时候默认有一个点击事件.要么删掉,要么自己改改.
             $('#model_add').click(function () {
@@ -182,7 +183,7 @@
             });
 
             //1.给删除按钮们注册事件.  使用委托的方式.
-            $('body').on('click', '.btn-delete', function () {
+            $('tbody').on('click', '.btn-delete', function () {
                 var that = $(this)
                 if (confirm('你确定要删除吗?')) {
                     //2.删除逻辑里面如何知道删除的是哪一个数据呢? 通过id区分.
@@ -190,18 +191,33 @@
                     var id = $(this).attr('data-id');
                     ///3.根据id删除文章类别的接口通过验证没有问题
                     $.ajax({
-                        url:'http://localhost:8000/admin/category_delete',
-                        type:'post',
-                        dataType:'json',
-                        data:{id:id},
-                        success: function(backData){
-                         //4.删除成功后,重新的再渲染一次数据
-                         //直接把这一行 从 dom树中移除 就ok.
-                           that.parent().parent().remove();
+                        url: 'http://localhost:8000/admin/category_delete',
+                        type: 'post',
+                        dataType: 'json',
+                        data: { id: id },
+                        success: function (backData) {
+                            //4.删除成功后,重新的再渲染一次数据
+                            //直接把这一行 从 dom树中移除 就ok.
+                            that.parent().parent().remove();
                         }
                     });
                 }
-            })
+            });
+
+            //1.编辑按钮也是动态生成的, 所以给他注册事件也要委托的方式注册.
+            $('tbody').on('click','.btn-bianji',function () {
+                //修改模态框tlete显示文本
+                $('#addModal .modal-title').html('修改分类');
+                  //给模态框里面的新增按钮添加 btn-success
+                 $('#model_add').addClass('btn-success').text('保存');
+                $('#addModal').modal('show');
+        })     
+            //2.在编辑逻辑里面,要传过来id,要告诉编辑逻辑编辑的是哪一个文章类别.
+            //3.编辑操作分为2步, 一步是显示修改之前的信息, 一步是把修改后的数据获取后发送ajax请求去修改.\
+            //4.新增和编辑使用的是同一个模态框, 所以模态框显示信息,或者某些按钮要做一些修改
+            //5.新增和编辑弹出的是同一个模态框, 那模态框里面的新增(保存)按钮要处理2套逻辑.
+
+            
         })
     </script>
 </body>
