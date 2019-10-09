@@ -116,6 +116,7 @@
               success: function(backData){
                 console.log(backData);
                 $('.user_info img').attr('src',backData.data.user_pic);
+                //注意的是span标签不要设置text, 应该设置html,因为他设置的内容里面包含了标签. &nbsp
                 $('.user_info span').html('欢迎&nbsp;&nbsp;' + backData.data.nickname);
                 $('.user_center_link img').attr('src',backData.data.user_pic)
               }
