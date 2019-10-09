@@ -105,8 +105,24 @@
     </script>
     
     <script>
-       //点击退出那个a标签,发送ajax请求,
+       
        $(function(){
+        //一进到首页,就应该发送ajax请求,获取用户信息(个人图片和昵称)
+           
+          $.ajax({
+              url:'http://localhost:8000/admin/getuser',
+              type:'get',
+              dataType:'json',
+              success: function(backData){
+                console.log(backData);
+                $('.user_info img').attr('src',backData.data.user_pic);
+                $('.user_info span').html('欢迎&nbsp;&nbsp;' + backData.data.nickname);
+                $('.user_center_link img').attr('src',backData.data.user_pic)
+              }
+          });
+          
+
+            //点击退出那个a标签,发送ajax请求,
            $('.logout').on('click',function(e){
                e.preventDefault();
                $.ajax({
